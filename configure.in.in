@@ -1,0 +1,105 @@
+dnl $Id$
+dnl
+dnl Copyright (c) 2006
+dnl         Jannis Pohlmann <jannis@xfce.org>
+dnl
+dnl Copyright (c) 2013
+dnl         Kazuki Oikawa <k@oikw.org>
+dnl
+
+dnl ***************************
+dnl *** Version information ***
+dnl ***************************
+m4_define([tap_version_major], [0])
+m4_define([tap_version_minor], [0])
+m4_define([tap_version_micro], [0])
+m4_define([tap_version_nano],  []) dnl leave this empty to have no nano version
+m4_define([tap_version_build], [@REVISION@])
+m4_define([tap_version_tag],   [git])
+m4_define([tap_version], [tap_version_major().tap_version_minor().tap_version_micro()ifelse(tap_version_nano(), [], [], [.tap_version_nano()])ifelse(tap_version_tag(), [git], [tap_version_tag()-tap_version_build()], [tap_version_tag()])])
+
+dnl *******************************************
+dnl *** Debugging support for GIT snapshots ***
+dnl *******************************************
+m4_define([tap_debug_default], [ifelse(tap_version_tag(), [git], [yes], [minimum])])
+
+dnl ***************************
+dnl *** Initialize autoconf ***
+dnl ***************************
+AC_COPYRIGHT([Copyright (c) 2013 Kazuki Oikawa <k@oikw.org>.])
+AC_INIT([thunar-nilfs2-plugin], [tap_version], [thunar-dev@xfce.org])
+AC_PREREQ([2.50])
+AC_CANONICAL_TARGET()
+AC_REVISION([tap_version_build])
+
+dnl ***************************
+dnl *** Initialize automake ***
+dnl ***************************
+AM_CONFIG_HEADER([config.h])
+AM_INIT_AUTOMAKE([1.8 no-dist-gzip dist-bzip2 tar-ustar])
+AM_MAINTAINER_MODE()
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+dnl *******************************
+dnl *** Check for UNIX variants ***
+dnl *******************************
+AC_AIX()
+AC_ISC_POSIX()
+AC_MINIX()
+
+dnl ********************************
+dnl *** Check for basic programs ***
+dnl ********************************
+AC_PROG_CC()
+AC_PROG_LD()
+AC_PROG_INSTALL()
+AC_PROG_INTLTOOL()
+
+dnl **************************
+dnl *** Initialize libtool ***
+dnl **************************
+LT_PREREQ([2.2.6])
+LT_INIT([disable-static])
+
+dnl ******************************
+dnl *** Check for i18n support ***
+dnl ******************************
+XDT_I18N([@LINGUAS@])
+
+dnl ***********************************
+dnl *** Check for required packages ***
+dnl ***********************************
+XDT_CHECK_PACKAGE([GTK], [gtk+-2.0], [2.12.0])
+XDT_CHECK_PACKAGE([EXO], [exo-1], [0.5.0])
+XDT_CHECK_PACKAGE([THUNARX], [thunarx-2], [1.0.1])
+
+dnl TODO: NILFS2 library check
+
+dnl ***********************************
+dnl *** Check for debugging support ***
+dnl ***********************************
+XDT_FEATURE_DEBUG([tap_debug_default])
+
+dnl **************************************
+dnl *** Check for linker optimizations ***
+dnl **************************************
+XDT_FEATURE_LINKER_OPTS()
+
+dnl *********************************
+dnl *** Substitute platform flags ***
+dnl *********************************
+AC_MSG_CHECKING([PLATFORM_CPPFLAGS])
+AC_MSG_RESULT([$PLATFORM_CPPFLAGS])
+AC_SUBST([PLATFORM_CPPFLAGS])
+AC_MSG_CHECKING([PLATFORM_CFLAGS])
+AC_MSG_RESULT([$PLATFORM_CFLAGS])
+AC_SUBST([PLATFORM_CFLAGS])
+AC_MSG_CHECKING([PLATFORM_LDFLAGS])
+AC_MSG_RESULT([$PLATFORM_LDFLAGS])
+AC_SUBST([PLATFORM_LDFLAGS])
+
+AC_OUTPUT([
+Makefile
+po/Makefile.in
+thunar-plugin/Makefile
+])
